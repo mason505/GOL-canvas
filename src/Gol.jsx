@@ -82,11 +82,10 @@ export default  React.createClass({
         const scaleFactor = 2;
         grid.map((row, i) => {
             row.map((cell, j) => {
-
                 let width = this.props.width / row.length / scaleFactor;
                 let height = this.props.height / grid. length / scaleFactor;
 
-                this.context.fillStyle = cell ? "#F8C941" : "#231F20";
+                this.context.fillStyle = getColor(cell);
                 this.context.fillRect(j * width, i * height, width, height);
             });
         });
@@ -105,6 +104,17 @@ export default  React.createClass({
     }
 });
 
+
+const getColor = cell => {
+    switch(cell) {
+    case 0:
+        return "#FFCC36";
+    case 1:
+        return "#EDCD6B";
+    default:
+        return "#EDCD6B";
+    }
+};
 
 const drawDimond = (ctx, x, y, width, height) => {
     ctx.beginPath();
