@@ -4,7 +4,7 @@
     "description": "Game of Life done in the branding style of Mindshare Labs",
     "main": "./src/main.js",
     "scripts": {
-        "start": "webpack -w",
+        "start": "webpack -w & open dist/index.html",
         "build" : "webpack -p",
         "test": "mocha --require babel-core/register -w"
     },
