@@ -7992,10 +7992,6 @@
 	  }
 	};
 
-	function registerNullComponentID() {
-	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
-	}
-
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
 	  this._rootNodeID = null;
@@ -8004,7 +8000,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
+	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -18727,7 +18723,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.8';
+	module.exports = '0.14.7';
 
 /***/ },
 /* 147 */
@@ -19787,11 +19783,10 @@
 	        var scaleFactor = 2;
 	        grid.map(function (row, i) {
 	            row.map(function (cell, j) {
-
 	                var width = _this2.props.width / row.length / scaleFactor;
 	                var height = _this2.props.height / grid.length / scaleFactor;
 
-	                _this2.context.fillStyle = cell ? "#F8C941" : "#231F20";
+	                _this2.context.fillStyle = getColor(cell);
 	                _this2.context.fillRect(j * width, i * height, width, height);
 	            });
 	        });
@@ -19808,6 +19803,17 @@
 	    }
 	});
 
+
+	var getColor = function getColor(cell) {
+	    switch (cell) {
+	        case 0:
+	            return "#FFCC36";
+	        case 1:
+	            return "#EDCD6B";
+	        default:
+	            return "#EDCD6B";
+	    }
+	};
 
 	var drawDimond = function drawDimond(ctx, x, y, width, height) {
 	    ctx.beginPath();
