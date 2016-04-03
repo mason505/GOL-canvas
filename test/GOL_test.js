@@ -127,17 +127,15 @@ describe('GOL', function() {
         const life = new GOL(3);
 
         life.spawnLife(1,0);
+        life.spawnLife(1,1);
         life.spawnLife(1,2);
-        life.spawnLife(0,1);
-        life.spawnLife(2,1);
+
 
         life.step();
-
+        expect(life.isAlive(0,1)).to.be.true;
         expect(life.isAlive(1,1)).to.be.true;
+        expect(life.isAlive(2,1)).to.be.true;
 
-        life.step();
-
-        expect(life.isAlive(1,1)).to.not.be.true;
     });
 });
 

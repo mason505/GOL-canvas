@@ -22,16 +22,14 @@ class GOL {
     step() {
         const livingCells = this.getAliveCells();
 
-        console.log('livingCells', livingCells.length);
-
         let possibleLife = livingCells
                 .map(([x,y]) => this.getNeighbors(x,y));
 
         possibleLife = _.flatten(possibleLife).concat(livingCells);
-        possibleLife = _.uniqWith(possibleLife, _.isEqual);
 
-        console.log("possibleLife", possibleLife.length);
 
+
+        if (! possibleLife.length) console.log('no morelife');
         const aliveNext = [];
         possibleLife.forEach( ([x,y]) => {
             const livingNs = this.countLivingNeighbors(x,y);
@@ -53,7 +51,6 @@ class GOL {
 
         });
 
-        console.log('aliveNext',aliveNext.length);
 
         this.living = aliveNext;
     }
