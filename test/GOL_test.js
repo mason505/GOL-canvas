@@ -54,14 +54,21 @@ describe('GOL', function() {
         const { ALIVE, DEAD } = GOL.STATES();
 
         expect( grid[0][0] ).to.be.equal(ALIVE);
-        expect( grid[0][1] ).to.be.equal(ALIVE);
+        expect( grid[1][0] ).to.be.equal(ALIVE);
         expect( grid[2][2] ).to.be.equal(DEAD);
     });
 
     it('can tell is a square is valid', function() {
-        const life = new GOL(3);
+        const life = new GOL(4, 3);
 
-        expect( life.isValidCell(0,0) ).to.be.true;
+        expect( life.isValidCell(-1, 2) ).to.not.be.true;
+        expect( life.isValidCell(4, 3) ).to.not.be.true;
+        expect( life.isValidCell(4, 2) ).to.not.be.true;
+        expect( life.isValidCell(2, 3) ).to.not.be.true;
+
+        expect( life.isValidCell(2, 1) ).to.be.true;
+        expect( life.isValidCell(2, 2) ).to.be.true;
+
     });
 
     it('can tell if a cell is dead', function(){
@@ -74,21 +81,22 @@ describe('GOL', function() {
         const life = new GOL(4, 2);
 
         life.spawnLife(0,0);
-        expect( life.isAlive(0, 0) ).to.be.true;
-        expect( life.isAlive(3, 3) ).to.not.be.true;
-        expect( life.isAlive(2, 3) ).to.not.be.true;
-        expect( life.isAlive(-1, 0) ).to.not.be.true;
+        life.spawnLife(0, 1);
 
-        printGrid(life.getGrid());
+        expect( life.isAlive(0, 0) ).to.be.true;
+        expect( life.isAlive(0, 1) ).to.be.true;
+
+        expect( life.isAlive(1, 0) ).to.not.be.true;
 
     });
 
     it('can spawn life in a cell', function() {
         const life = new GOL(4);
         life.spawnLife(2,2);
+        life.spawnLife(2,1);
 
         const livingCells = life.getAliveCells();
-        expect(livingCells).to.include({ x: 2, y:2 });
+        expect(livingCells).to.deep.include.members([ [2,1], [2,2] ]);
     });
 
     it('can generate the coords of all the neighbors of a cell', function(){
@@ -98,20 +106,38 @@ describe('GOL', function() {
         expect(n1).to.deep.include.members([ [0,1], [1,0] ]);
 
         const n2 = life.getNeighbors(2,1);
-        expect(n2).to.deep.include.members([ [2,0], [1,1], [1,2] ]);
+        expect(n2).to.deep.include.members([ [2,0], [1,1], [2,2] ]);
 
         const n3 = life.getNeighbors(1,1);
-        exist(n3).to.deep.include.members([ [0,1], [1,2], [2,1], [1,0] ]);
+        expect(n3).to.deep.include.members([ [0,1], [1,2], [2,1], [1,0] ]);
+    });
+
+    it('counts living neighbors', function() {
+        const life = new GOL(3);
+
+        life.spawnLife(1,0);
+        life.spawnLife(2,1);
+        life.spawnLife(1,2);
+
+
+        expect( life.countLivingNeighbors(1,1) ).to.be.equal(3);
     });
 
     it('can update its state according to GOL rules', function() {
         const life = new GOL(3);
+
         life.spawnLife(1,0);
         life.spawnLife(1,2);
+        life.spawnLife(0,1);
+        life.spawnLife(2,1);
 
         life.step();
 
         expect(life.isAlive(1,1)).to.be.true;
+
+        life.step();
+
+        expect(life.isAlive(1,1)).to.not.be.true;
     });
 });
 

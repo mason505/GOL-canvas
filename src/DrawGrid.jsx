@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import GOL from './GOL.js';
+
 
 const id = 'gol';
 
@@ -59,12 +61,36 @@ export default  React.createClass({
         this.context.rotate(45 * Math.PI / 180)
 
 
-        this.context.globalAlpha = 0.8;
-        this.drawGrid(makeGrid(40));
+        // this.context.globalAlpha = 0.8;
+
+        const gol = new GOL(20);
+
+        gol.spawnLife(9,8);
+        gol.spawnLife(9,7);
+        gol.spawnLife(9,6);
+
+
+        gol.spawnLife(8,9);
+        gol.spawnLife(8,7);
+        gol.spawnLife(7,8);
+        gol.spawnLife(9,8);
+
+
+        gol.spawnLife(6,4);
+        gol.spawnLife(6,5);
+        gol.spawnLife(6,3);
+
+        gol.spawnLife(4,4);
+        gol.spawnLife(4,5);
+        gol.spawnLife(4,3);
+
+
+        this.drawGrid(gol.getGrid());
 
         setInterval(() => {
-            this.drawGrid(makeGrid(40));
-        }, 50);
+            gol.step();
+            this.drawGrid(gol.getGrid());
+        }, 4 * 100);
     },
 
     drawGrid(grid) {
@@ -97,7 +123,7 @@ export default  React.createClass({
 const getColor = cell => {
     switch(cell) {
     case 0:
-        return "#FFCC36";
+        return "#E1E9D6";
     case 1:
         return "#EDCD6B";
     default:

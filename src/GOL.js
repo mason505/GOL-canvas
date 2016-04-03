@@ -20,19 +20,75 @@ class GOL {
     }
 
     step() {
-        /*
-for every living cell count number of living neighbors.
-*/
+        const livingCells = this.getAliveCells();
+
+        console.log('livingCells', livingCells.length);
+
+        let possibleLife = livingCells
+                .map(([x,y]) => this.getNeighbors(x,y));
+
+        possibleLife = _.flatten(possibleLife).concat(livingCells);
+        possibleLife = _.uniqWith(possibleLife, _.isEqual);
+
+        console.log("possibleLife", possibleLife.length);
+
+        const aliveNext = [];
+        possibleLife.forEach( ([x,y]) => {
+            const livingNs = this.countLivingNeighbors(x,y);
+            const isAlive = this.isAlive(x,y);
+
+            if (isAlive) {
+                if (livingNs < 2) {
+                    return;
+                } else if (livingNs === 2 || livingNs === 3) {
+                    aliveNext.push([x,y]);
+                } else if (livingNs > 3) {
+                    return;
+                }
+            } else {
+                if (livingNs === 3) {
+                    aliveNext.push([x,y]);
+                }
+            }
+
+        });
+
+        console.log('aliveNext',aliveNext.length);
+
+        this.living = aliveNext;
+    }
+
+    checkCell(x, y) {
+        if (! this.isValidCell(x, x))
+            throw new Error(`INVALID POSITION: { x: ${x}, y: ${y} }`);
     }
 
     getNeighbors(x, y) {
-        const neighbors = [];
+        this.checkCell(x,y);
+        const neighbors = [
+            [x-1, y-1],
+            [x+1, y-1],
+            [x-1, y+1],
+            [x+1, y+1],
+            [x-1, y],
+            [x, y-1],
+            [x+1, y],
+            [x, y+1]
+        ];
+
+        return neighbors.filter(([x,y]) => this.isValidCell(x,y));
+    }
+
+    countLivingNeighbors(x, y) {
+        return this.getNeighbors(x, y)
+            .filter(([x, y]) => this.isAlive(x,y))
+            .length;
     }
 
     isValidCell(x, y) {
         return x >= 0 && y >= 0
             && x < this.getWidth()
-            && y <= this.getHeight();
+            && y < this.getHeight();
     }
 
     getGrid() {
@@ -42,9 +98,9 @@ for every living cell count number of living neighbors.
         const height = this.getHeight();
 
         const grid = [];
-        for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
             let row = [];
-            for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
                 const state = this.isAlive(x, y)
                           ? ALIVE
                           : DEAD;
@@ -58,16 +114,14 @@ for every living cell count number of living neighbors.
     }
 
     isAlive(row, col) {
-        const matches = cell => {
-            return cell.x === row && cell.y === col;
-        };
-
+        this.checkCell(row, col);
+        const matches = cell =>  _.isEqual(cell, [row, col]);
         return _.some(this.living, matches);
     }
 
-    spawnLife(row, col) {
-        if (this.isAlive(row, col)) return;
-        this.living = [...this.living, { x: row, y:col }];
+    spawnLife(x, y) {
+        if (this.isAlive(x, y)) return;
+        this.living = [...this.living, [x,y] ];
     }
 
 }
