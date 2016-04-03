@@ -9,22 +9,6 @@ const style = {
     border: "1px solid #000000"
 };
 
-const makeGrid = num => {
-    let g = [];
-
-    for (let i = 0; i < num; i++) {
-
-        let a = [];
-        for (let j = 0; j < num; j++) {
-            a.push( Math.random() > 0.5 ? 1 : 0);
-        }
-        g.push(a);
-
-    }
-
-    return g;
-};
-
 export default  React.createClass({
 
     getDefaultProps() {
@@ -34,23 +18,16 @@ export default  React.createClass({
         };
     },
 
-    componentDidMount() {
-        const canvas = document.getElementById(id);
 
-        // if retina
+    upscale(canvas = this.canvas){
         canvas.height = this.props.height;
         canvas.width = this.props.width;
         canvas.style.width = `${this.props.width / 2}px`;
         canvas.style.height = `${this.props.height / 2}px`;
         canvas.getContext('2d').scale(2,2);
-        // end if retina
+    },
 
-        this.canvas = canvas;
-
-        const ctx = this.context = canvas.getContext("2d");
-
-
-        // setup graphic context
+    setPerspectiveTransform() {
         const baseScale = 3;
         const diagLen = Math.sqrt( this.props.height * this.props.height + this.props.width * this.props.width );
         let ytranslate = diagLen - this.props.height
@@ -60,26 +37,44 @@ export default  React.createClass({
         this.context.setTransform(baseScale * 2, 0, 0, baseScale, (this.props.width / 2), -ytranslate);
         this.context.rotate(45 * Math.PI / 180)
 
+        this.context.globalAlpha = 0.8;
+    },
 
-        // this.context.globalAlpha = 0.8;
+    setDisplayContext(setPerspectiveTransform = true){
+        this.canvas = document.getElementById(id);;
+        this.context = this.canvas.getContext("2d");
+
+        // this must be called before setPerspectiveTransform
+        this.upscale();
+
+        if (setPerspectiveTransform) this.setPerspectiveTransform();
+    },
+
+    componentDidMount() {
+        this.setDisplayContext();
+
+        // setup graphic context
 
         const gol = new GOL(20);
 
+        const bx = 12;
+        const by = 6;
+
+        gol.spawnLife(bx,by);
+        gol.spawnLife(bx + 1,by);
+        gol.spawnLife(bx + 1,by-2);
+        gol.spawnLife(bx + 3,by-1);
+        gol.spawnLife(bx + 4,by);
+        gol.spawnLife(bx + 5,by);
+        gol.spawnLife(bx + 6,by);
+
+
+        gol.spawnLife(5,8);
+        gol.spawnLife(5,8);
         gol.spawnLife(9,8);
         gol.spawnLife(9,7);
         gol.spawnLife(9,6);
-
-
-        gol.spawnLife(8,9);
-        gol.spawnLife(8,7);
-        gol.spawnLife(7,8);
-        gol.spawnLife(9,8);
-
-
-        gol.spawnLife(6,4);
-        gol.spawnLife(6,5);
         gol.spawnLife(6,3);
-
         gol.spawnLife(4,4);
         gol.spawnLife(4,5);
         gol.spawnLife(4,3);
@@ -90,7 +85,7 @@ export default  React.createClass({
         setInterval(() => {
             gol.step();
             this.drawGrid(gol.getGrid());
-        }, 4 * 100);
+        }, 3 * 100);
     },
 
     drawGrid(grid) {
@@ -130,6 +125,8 @@ const getColor = cell => {
         return "#EDCD6B";
     }
 };
+
+
 
 const drawDimond = (ctx, x, y, width, height) => {
     ctx.beginPath();
