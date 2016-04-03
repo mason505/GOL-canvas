@@ -26,7 +26,7 @@ class GOL {
                 .map(([x,y]) => this.getNeighbors(x,y));
 
         possibleLife = _.flatten(possibleLife).concat(livingCells);
-
+        possibleLife = _.uniqWith(possibleLife, _.isEqual);
 
 
         if (! possibleLife.length) console.log('no morelife');
