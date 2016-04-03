@@ -6,7 +6,8 @@
     "scripts": {
         "start": "webpack -w & open dist/index.html",
         "build" : "webpack -p",
-        "test": "mocha --require babel-core/register -w"
+        "test": "mocha --require babel-core/register",
+        "test:watch": "mocha --require babel-core/register -w"
     },
     "keywords": [
         "canvas",

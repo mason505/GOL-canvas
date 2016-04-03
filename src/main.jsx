@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 
-import GOL from './Gol.jsx';
+import Grid from './DrawGrid.jsx';
 
 
 class App extends Component {
     render() {
         return (
             <div>
-              <GOL />
+              <Grid />
             </div>
         );
     }

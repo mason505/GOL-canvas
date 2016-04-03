@@ -7,14 +7,6 @@ const style = {
     border: "1px solid #000000"
 };
 
-let grid = [
-    [1,0,1],
-    [1,1,1],
-    [1,0,0],
-    [1,0,0],
-    [1,0,0],
-];
-
 const makeGrid = num => {
     let g = [];
 
@@ -31,11 +23,6 @@ const makeGrid = num => {
     return g;
 };
 
-grid = makeGrid(30);
-
-// grid = [
-// [1,1],
-// ];
 export default  React.createClass({
 
     getDefaultProps() {
@@ -73,9 +60,11 @@ export default  React.createClass({
 
 
         this.context.globalAlpha = 0.8;
+        this.drawGrid(makeGrid(40));
+
         setInterval(() => {
             this.drawGrid(makeGrid(40));
-        }, 400);
+        }, 50);
     },
 
     drawGrid(grid) {
