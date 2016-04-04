@@ -19,40 +19,48 @@ class GOL {
         return [...this.living];
     }
 
-    step() {
+    /**
+     * returns all living cells and their neighbors.
+     * any cell that life could spread to.
+     */
+    getPossilbeLifeCells() {
         const livingCells = this.getAliveCells();
 
-        let possibleLife = livingCells
-                .map(([x,y]) => this.getNeighbors(x,y));
+        return _.chain(livingCells)
+            .map(([x,y]) => this.getNeighbors(x,y))
+            .flatten()
+            .concat(livingCells)
+            .uniqWith(_.isEqual)
+            .value();
+    }
 
-        possibleLife = _.flatten(possibleLife).concat(livingCells);
-        possibleLife = _.uniqWith(possibleLife, _.isEqual);
+    // TODO refactor this to be a reducer function?
+    _isAliveNextGen([x, y]) {
+        const livingNs = this.countLivingNeighbors(x,y);
+        const isAlive = this.isAlive(x,y);
 
-
-        if (! possibleLife.length) console.log('no morelife');
-        const aliveNext = [];
-        possibleLife.forEach( ([x,y]) => {
-            const livingNs = this.countLivingNeighbors(x,y);
-            const isAlive = this.isAlive(x,y);
-
-            if (isAlive) {
-                if (livingNs < 2) {
-                    return;
-                } else if (livingNs === 2 || livingNs === 3) {
-                    aliveNext.push([x,y]);
-                } else if (livingNs > 3) {
-                    return;
-                }
-            } else {
-                if (livingNs === 3) {
-                    aliveNext.push([x,y]);
-                }
+        if (isAlive) {
+            if (livingNs < 2) {
+                return false;
+            } else if (livingNs === 2 || livingNs === 3) {
+                return [x,y];
+            } else if (livingNs > 3) {
+                return false;
             }
+        } else {
+            if (livingNs === 3) {
+                return [x,y];
+            }
+        }
 
-        });
+        return false;
+    }
 
-
-        this.living = aliveNext;
+    step() {
+        this.living = _.chain(this.getPossilbeLifeCells())
+            .map(this._isAliveNextGen.bind(this))
+            .compact()
+            .value();
     }
 
     checkCell(x, y) {
